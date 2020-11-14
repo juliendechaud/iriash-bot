@@ -54,5 +54,13 @@ async def cki(ctx, member: discord.Member=None):
 async def cki_error(ctx, error):
 	await ctx.send(str(error))
 
+@bot.command()
+async def github(ctx):
+	await ctx.send("La page GitHub de Iriash : https://github.com/juliendechaud/iriash-bot")
+
+@bot.command()
+async def bug(ctx):
+	await ctx.send("Si vous voyez un bug dites le ici : https://github.com/juliendechaud/iriash-bot/issues")
+
 #run the bot
 bot.run(TOKEN)
