@@ -1,18 +1,17 @@
-#iriash's source code by Julien Dechaud
-#https://github.com/juliendechaud/iriash-bot
+#code source de bisounours-discord par Julien Dechaud
+#https://github.com/juliendechaud/bisounours-discord
 
 #importation des modules
 import os
 from dotenv import load_dotenv #variables d'environnement
 import discord #api discord
 from discord.ext import commands #gestion des commandes
-from discord.ext.commands import has_permissions #gestion des permissions des utilisateurs
 
 #initialisation
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 bot = discord.Client()
-intents = discord.Intents.default() #droits pour la récupération des informations depuis discord
+intents = discord.Intents.default() #récupération des activités des users
 intents.members = True
 bot = commands.Bot(command_prefix='$', intents=intents)
 
@@ -56,11 +55,7 @@ async def cki_error(ctx, error):
 
 @bot.command()
 async def github(ctx):
-	await ctx.send("La page GitHub de Iriash : https://github.com/juliendechaud/iriash-bot")
-
-@bot.command()
-async def bug(ctx):
-	await ctx.send("Si vous voyez un bug dites le ici : https://github.com/juliendechaud/iriash-bot/issues")
+	await ctx.send("La page GitHub de bisounours : https://github.com/juliendechaud/bisounours-discord")
 
 #run the bot
 bot.run(TOKEN)
