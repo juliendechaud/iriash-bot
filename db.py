@@ -42,5 +42,8 @@ class db():
 		result = self.execute(f'SELECT mot FROM banword WHERE id_server = {id_server}')
 		return result.fetchall()
 
+	def banword_del(self, id_server, banword_id):
+		return self.execute(f'DELETE FROM banword WHERE id_server = {id_server} AND id = {banword_id}')
+
 	def __del__(self):
 		self.conn.close()

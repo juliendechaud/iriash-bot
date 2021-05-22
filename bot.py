@@ -127,12 +127,27 @@ async def banword(ctx, arg, word=None):
 		else:
 			await ctx.send(f'{ctx.author.mention}, il faut écrire un banword (max 40 caractères) !')
 
+	elif arg=="del":
+		if word!=None:
+			if db.banword_del(ctx.guild.id, word).rowcount == 1:
+				await ctx.send(f'{ctx.author.mention}, banword supprimer !')
+			else:
+				await ctx.send(f'{ctx.author.mention}, ce baword n\'existe pas !')
+
 	elif arg=="list":
 		result = ""
 		cache_result = db.banword_list(ctx.guild.id)
 		for r in cache_result:
 			cree = bot.get_user(r[2])
 			result += f'\nBanword : "{r[3]}" crée par {cree.mention}'
+		await ctx.send(f'{ctx.author.mention}, {result}')
+
+	elif arg=="list-id":
+		result = ""
+		cache_result = db.banword_list(ctx.guild.id)
+		for r in cache_result:
+			cree = bot.get_user(r[2])
+			result += f'\nBanword [{r[0]}] : "{r[3]}" crée par {cree.mention}'
 		await ctx.send(f'{ctx.author.mention}, {result}')
 	
 #si la commande ne passe pas
