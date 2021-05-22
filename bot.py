@@ -26,6 +26,20 @@ async def on_ready():
 	print(f'Connecté sur {len(bot.guilds)} serveur(s)')
 	await bot.change_presence(activity=discord.Game("$help"))
 
+#event a chaque message posté
+@bot.event
+async def on_message(message):
+	nbr_banword = 0
+	if message.author.id!=bot.user.id:
+		for banword in db.banword_list_mot(message.guild.id):
+			if banword[0] in message.content:
+				nbr_banword += 1
+
+		if nbr_banword>0:
+			await message.delete()
+			await message.channel.send(f"J'ai trouvé {nbr_banword} banword(s) dans ton message {message.author.mention}... fais attention !")
+	await bot.process_commands(message)
+
 #commande latence
 @bot.command()
 async def ping(ctx):
@@ -100,6 +114,30 @@ async def warning(ctx, arg, member: discord.Member=None, message=None):
 #si la commande ne passe pas
 @warning.error
 async def warning_error(ctx, error):
+	await ctx.send(f'{ctx.author.mention}, j\'ai rencontré un problème : {error}')
+
+#gestion des banwords
+@bot.command()
+@commands.has_permissions(manage_messages=True)
+async def banword(ctx, arg, word=None):
+	if arg=="add":
+		if word!=None and len(word)<=40:
+			db.banword_add(ctx.guild.id, ctx.author.id, word)
+			await ctx.send(f'{ctx.author.mention}, banword ajouter !')
+		else:
+			await ctx.send(f'{ctx.author.mention}, il faut écrire un banword (max 40 caractères) !')
+
+	elif arg=="list":
+		result = ""
+		cache_result = db.banword_list(ctx.guild.id)
+		for r in cache_result:
+			cree = bot.get_user(r[2])
+			result += f'\nBanword : "{r[3]}" crée par {cree.mention}'
+		await ctx.send(f'{ctx.author.mention}, {result}')
+	
+#si la commande ne passe pas
+@banword.error
+async def banword_error(ctx, error):
 	await ctx.send(f'{ctx.author.mention}, j\'ai rencontré un problème : {error}')
 
 #execute le bot

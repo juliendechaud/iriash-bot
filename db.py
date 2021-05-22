@@ -31,5 +31,16 @@ class db():
 		result = self.execute(f'SELECT * FROM warning WHERE id_server = {id_server}')
 		return result.fetchall()
 
+	def banword_add(self, id_server, cree_par, mot):
+		return self.execute(f'INSERT INTO banword (id_server, cree_par, mot) VALUES ({id_server}, {cree_par}, "{mot}")')
+
+	def banword_list(self, id_server):
+		result = self.execute(f'SELECT * FROM banword WHERE id_server = {id_server}')
+		return result.fetchall()
+
+	def banword_list_mot(self, id_server):
+		result = self.execute(f'SELECT mot FROM banword WHERE id_server = {id_server}')
+		return result.fetchall()
+
 	def __del__(self):
 		self.conn.close()
