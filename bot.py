@@ -13,7 +13,10 @@ import db
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 bot = discord.Client()
-bot = commands.Bot(command_prefix='$')
+intents = discord.Intents.default()
+intents.members = True
+intents.presences = True
+bot = commands.Bot(command_prefix='$', intents=intents)
 db = db.db("bisounours.db")
 
 #quand le bot est prêt
@@ -76,11 +79,23 @@ async def event(ctx, *arg):
 #applique des avertissements 
 @bot.command()
 @commands.has_permissions(kick_members=True, ban_members=True)
-async def warning(ctx, member: discord.Member=None):
-	if member != None:
-		await ctx.send(f'{member.mention}, attention vous avez un warning !')
-	else:
-		await ctx.send(f'{ctx.author.mention}, vous devez mettre un utilisateur.')
+async def warning(ctx, arg, member: discord.Member=None, message=None):
+	
+	if arg=="add":
+		if member != None:
+			db.warning_add(ctx.guild.id, ctx.author.id, member.id, message)
+			await ctx.send(f'{member.mention}, attention vous avez un warning !')
+		else:
+			await ctx.send(f'{ctx.author.mention}, vous devez mettre un utilisateur.')
+
+	elif arg=="list":
+		result = ""
+		cache_result = db.warning_list(ctx.guild.id)
+		for r in cache_result:
+			cree = bot.get_user(r[2])
+			pour = bot.get_user(r[3])
+			result += f'\nWarning à {pour.mention} crée par {cree.mention}, le {r[4]}. Raison : {r[5]}'
+		await ctx.send(f'{ctx.author.mention}, {result}')
 
 #si la commande ne passe pas
 @warning.error

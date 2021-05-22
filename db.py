@@ -24,8 +24,11 @@ class db():
 		result = self.execute(f'SELECT * FROM event WHERE id_server = {id_server} and dateheure >= date() order by dateheure')
 		return result.fetchall()
 
-	def warning_list(self):
-		result = self.execute("SELECT * FROM warning")
+	def warning_add(self, id_server, cree_par, pour, message):
+		return self.execute(f'INSERT INTO warning (id_server, cree_par, pour, dateheure, message) VALUES ({id_server}, {cree_par}, {pour}, datetime(), "{message}")')
+
+	def warning_list(self, id_server):
+		result = self.execute(f'SELECT * FROM warning WHERE id_server = {id_server}')
 		return result.fetchall()
 
 	def __del__(self):
