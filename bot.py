@@ -8,6 +8,7 @@ import discord #api discord
 from discord.ext import commands #gestion des commandes
 import datetime
 import db
+import embed
 
 #initialisation
 load_dotenv()
@@ -18,6 +19,7 @@ intents.members = True
 intents.presences = True
 bot = commands.Bot(command_prefix='$', intents=intents)
 db = db.db("bisounours.db")
+emgen = embed.embedcreator()
 
 #quand le bot est prêt
 @bot.event
@@ -64,31 +66,34 @@ async def clear_error(ctx, error):
 #commande github
 @bot.command()
 async def event(ctx, *arg):
-	result = ""
 	
 	if len(arg) > 0:
 		if arg[0] == "list-all":
 			cache_result = db.event_list(ctx.guild.id)
 			for r in cache_result:
-				result += f'\nEvent : {r[3]}, le {r[4]}. Description : {r[5]}'
+				cree = bot.get_user(r[2])
+				await ctx.send(embed=emgen.event(r[3], r[4], r[5], cree, r[0]))
 
 		elif arg[0] == "list":
 			cache_result = db.event_list_after(ctx.guild.id)
 			for r in cache_result:
-				result += f'\nEvent : {r[3]}, le {r[4]}. Description : {r[5]}'
+				cree = bot.get_user(r[2])
+				await ctx.send(embed=emgen.event(r[3], r[4], r[5], cree, r[0]))
 
 		elif arg[0] == "add":
 			uneDate = datetime.datetime.strptime(arg[3], '%d-%m-%Y')
 			db.event_add(ctx.guild.id, ctx.author.id, arg[1], uneDate.date(), arg[2])
-			result = "event ajouter !"
+			await ctx.send("event ajouter !")
+
+		elif arg[0] == "del":
+			if arg[1]!=None:
+				if db.event_del(ctx.guild.id, arg[1]).rowcount == 1:
+					await ctx.send(f'{ctx.author.mention}, event supprimer !')
+				else:
+					await ctx.send(f'{ctx.author.mention}, cette event n\'existe pas !')
 
 		else:
-			result = "$help event"
-
-	else:
-		result = "$help event"
-
-	await ctx.send(f'{ctx.author.mention}, {result}')
+			await ctx.send("$help event")
 
 #applique des avertissements 
 @bot.command()
@@ -135,20 +140,11 @@ async def banword(ctx, arg, word=None):
 				await ctx.send(f'{ctx.author.mention}, ce baword n\'existe pas !')
 
 	elif arg=="list":
-		result = ""
 		cache_result = db.banword_list(ctx.guild.id)
 		for r in cache_result:
 			cree = bot.get_user(r[2])
-			result += f'\nBanword : "{r[3]}" crée par {cree.mention}'
-		await ctx.send(f'{ctx.author.mention}, {result}')
-
-	elif arg=="list-id":
-		result = ""
-		cache_result = db.banword_list(ctx.guild.id)
-		for r in cache_result:
-			cree = bot.get_user(r[2])
-			result += f'\nBanword [{r[0]}] : "{r[3]}" crée par {cree.mention}'
-		await ctx.send(f'{ctx.author.mention}, {result}')
+			result = emgen.banword(r[3], cree, r[0])
+			await ctx.send(embed=result)
 	
 #si la commande ne passe pas
 @banword.error
