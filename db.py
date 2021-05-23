@@ -29,7 +29,12 @@ class db():
 
 	def event_del(self, id_server, event_id):
 		""" suppression d'un event en base de donnée en fonction du serveur discord et de son id """
-		return self.execute(f'DELETE FROM event WHERE id_server = {id_server} AND id = {event_id}')	
+		return self.execute(f'DELETE FROM event WHERE id_server = {id_server} AND id = {event_id}')
+
+	def event_check(self, id_server):
+		""" suppression d'un event en base de donnée en fonction du serveur discord et de son id """
+		result = self.execute(f'SELECT * FROM event WHERE id_server = {id_server} AND dateheure = date()')
+		return result.fetchall()	
 
 	#fonctions pour les warnings
 	def warning_add(self, id_server, cree_par, pour, message):
@@ -60,7 +65,20 @@ class db():
 		""" suppression d'un banword en base de donnée en fonction du serveur discord et de son id """
 		return self.execute(f'DELETE FROM banword WHERE id_server = {id_server} AND id = {banword_id}')
 
+	#fonctions pour la gestion du channel d'annonce
+	def channel_add(self, id_server, id_channel, cree_par):
+		""" ajout d'un channel d'annonce en base de donnée en fonction du serveur discord """
+		return self.execute(f'INSERT INTO eventchannel (id_server, id_channel, cree_par) VALUES ({id_server}, {id_channel}, {cree_par})')
+
+	def channel_list(self, id_server):
+		""" ajout d'un channel d'annonce en base de donnée en fonction du serveur discord """
+		result = self.execute(f'SELECT * FROM eventchannel WHERE id_server = {id_server}')
+		return result.fetchall()
+
+	def channel_del(self, id_server):
+		""" ajout d'un channel d'annonce en base de donnée en fonction du serveur discord """
+		return self.execute(f'DELETE FROM eventchannel WHERE id_server = {id_server}')
+
 	def __del__(self):
 		""" quand on détruit l'objet, on ferme la connection a la base de donnée """
 		self.conn.close()
-		

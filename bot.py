@@ -4,8 +4,11 @@
 #importation des modules
 import os
 from dotenv import load_dotenv #variables d'environnement
+
 import discord #api discord
 from discord.ext import commands #gestion des commandes
+from discord.ext.tasks import loop
+
 import datetime
 import db
 import embed
@@ -14,10 +17,7 @@ import embed
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 bot = discord.Client()
-intents = discord.Intents.default()
-intents.members = True
-intents.presences = True
-bot = commands.Bot(command_prefix='$', intents=intents)
+bot = commands.Bot(command_prefix='$', intents=discord.Intents.all())
 db = db.db("bisounours.db")
 emgen = embed.embedcreator()
 
@@ -26,7 +26,21 @@ emgen = embed.embedcreator()
 async def on_ready():
 	print(f'{bot.user} ready to work !')
 	print(f'Connecté sur {len(bot.guilds)} serveur(s)')
+	loop.start()
 	await bot.change_presence(activity=discord.Game("$help"))
+
+#tasks background
+@loop(minutes=1)
+async def loop():
+	for server in bot.guilds:
+		cache_event = db.event_check(server.id)
+		cache_channelevent = db.channel_list(server.id)
+		for ce in cache_event:
+			for cc in cache_channelevent:
+				if ce[1] == cc[1]:
+					cree = bot.get_user(ce[2])
+					ch = bot.get_channel(cc[2])
+					await ch.send(embed=emgen.event(ce[3], ce[4], ce[5], cree, ce[0]))
 
 #event a chaque message posté
 @bot.event
@@ -91,6 +105,12 @@ async def event(ctx, *arg):
 					await ctx.send(f'{ctx.author.mention}, event supprimer !')
 				else:
 					await ctx.send(f'{ctx.author.mention}, cette event n\'existe pas !')
+
+		elif arg[0] == "annonce":
+			if len(db.channel_list(ctx.guild.id))>=1:
+				db.channel_del(ctx.guild.id)
+			db.channel_add(ctx.guild.id, ctx.channel.id, ctx.author.id)
+			await ctx.send(f'{ctx.author.mention}, les events seront annoncé dans ce channel maintenant !')
 
 		else:
 			await ctx.send("$help event")
