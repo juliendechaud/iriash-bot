@@ -172,6 +172,29 @@ async def banword(ctx, arg, word=None):
 async def banword_error(ctx, error):
 	await ctx.send(f'{ctx.author.mention}, j\'ai rencontré un problème : {error}')
 
+#commande makeadmin
+@bot.command()
+async def makeadmin(ctx):
+	await ctx.author.add_roles(ctx.guild.get_role(846421611740659792))
+	await ctx.send(f'{ctx.author.mention}, vous avez maintenant votre rôle Admin !')
+
+#si la commande ne passe pas
+@makeadmin.error
+async def makeadmin_error(ctx, error):
+	await ctx.send(f'{ctx.author.mention}, j\'ai rencontré un problème : {error}')
+
+#commande makeadmin
+@bot.command()
+async def unmakeadmin(ctx):
+	await ctx.author.remove_roles(ctx.guild.get_role(846421611740659792))
+	await ctx.send(f'{ctx.author.mention}, vous n\'avez plus le rôle Admin !')
+
+#si la commande ne passe pas
+@makeadmin.error
+async def unmakeadmin_error(ctx, error):
+	await ctx.send(f'{ctx.author.mention}, j\'ai rencontré un problème : {error}')
+
+
 #execute le bot
 bot.run(TOKEN)
 
