@@ -15,7 +15,7 @@ class db():
 	#fonctions pour les events
 	def event_add(self, id_server, cree_par, libelle, dateheure, description):
 		""" ajout d'un event en base de donnée en fonction du serveur discord """
-		return self.execute(f'INSERT INTO event (id_server, cree_par, libelle, dateheure, description) VALUES ({id_server}, {cree_par}, "{libelle}", "{dateheure}", "{description}")')
+		return self.execute(f'INSERT INTO event (id_server, cree_par, libelle, dateheure, description, annoncer) VALUES ({id_server}, {cree_par}, "{libelle}", "{dateheure}", "{description}", 0)')
 
 	def event_list(self, id_server):
 		""" liste des events en base de donnée en fonction du serveur discord """
@@ -27,13 +27,17 @@ class db():
 		result = self.execute(f'SELECT * FROM event WHERE id_server = {id_server} and dateheure >= date() order by dateheure')
 		return result.fetchall()
 
+	def event_upd(self, id_event, annoncer):
+		""" ajout d'un event en base de donnée en fonction du serveur discord """
+		return self.execute(f'UPDATE event SET annoncer = {annoncer} WHERE id = {id_event}')
+
 	def event_del(self, id_server, event_id):
 		""" suppression d'un event en base de donnée en fonction du serveur discord et de son id """
 		return self.execute(f'DELETE FROM event WHERE id_server = {id_server} AND id = {event_id}')
 
 	def event_check(self, id_server):
 		""" suppression d'un event en base de donnée en fonction du serveur discord et de son id """
-		result = self.execute(f'SELECT * FROM event WHERE id_server = {id_server} AND dateheure = date()')
+		result = self.execute(f'SELECT * FROM event WHERE id_server = {id_server} AND dateheure = date() AND annoncer = 0')
 		return result.fetchall()	
 
 	#fonctions pour les warnings

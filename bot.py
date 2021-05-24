@@ -7,7 +7,7 @@ from dotenv import load_dotenv #variables d'environnement
 
 import discord #api discord
 from discord.ext import commands #gestion des commandes
-from discord.ext.tasks import loop
+from discord.ext.tasks import loop #
 
 import datetime
 import db
@@ -30,7 +30,7 @@ async def on_ready():
 	await bot.change_presence(activity=discord.Game("$help"))
 
 #tasks background
-@loop(minutes=1)
+@loop(minutes=5)
 async def loop():
 	for server in bot.guilds:
 		cache_event = db.event_check(server.id)
@@ -38,9 +38,10 @@ async def loop():
 		for ce in cache_event:
 			for cc in cache_channelevent:
 				if ce[1] == cc[1]:
-					cree = bot.get_user(ce[2])
-					ch = bot.get_channel(cc[2])
-					await ch.send(embed=emgen.event(ce[3], ce[4], ce[5], cree, ce[0]))
+					if db.event_upd(ce[0], 1).rowcount == 1:
+						cree = bot.get_user(ce[2])
+						ch = bot.get_channel(cc[2])
+						await ch.send(embed=emgen.event(ce[3], ce[4], ce[5], cree, ce[0]))
 
 #event a chaque message posté
 @bot.event
