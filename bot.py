@@ -58,17 +58,17 @@ async def on_message(message):
 	await bot.process_commands(message)
 
 #commande latence
-@bot.command()
+@bot.command(brief="Ping-Pong", help="Retourne la latence entre vous et le bot.")
 async def ping(ctx):
 	await ctx.send(f'{ctx.author.mention}, latence de {round(bot.latency, 3)} ms')
 
 #commande github
-@bot.command()
+@bot.command(brief="Page GitHub", help="Retourne la page GitHub du projet.")
 async def github(ctx):
 	await ctx.send(f'{ctx.author.mention}, Voici la page GitHub de Bisounours : https://github.com/juliendechaud/bisounours-discord')
 
 #supprime x message(s)
-@bot.command()
+@bot.command(brief="Supprimer des messages", usage="X", help="Supprime X messages.")
 @commands.has_permissions(manage_messages=True)
 async def clear(ctx, mnt=10):
 	await ctx.channel.purge(limit=mnt+1)
@@ -79,7 +79,7 @@ async def clear_error(ctx, error):
 	await ctx.send(f'{ctx.author.mention}, j\'ai rencontré un problème : {error}')
 
 #commande github
-@bot.command()
+@bot.command(brief="Gestion des events", help="Gestion des events.\nPour ajouter un event : $event add \"Réunion Projet\" \"Description de la réunion\" 14-07-2021\nPour supprimer un event : $event del idEvent\nPour afficher les events futur : $event list\nPour afficher tout les events : $event list-all\nPour définir le channel d'annonce des events : $event annonce")
 async def event(ctx, *arg):
 	
 	if len(arg) > 0:
@@ -117,7 +117,7 @@ async def event(ctx, *arg):
 			await ctx.send("$help event")
 
 #applique des avertissements 
-@bot.command()
+@bot.command(brief="Gestion des warnings", help="Crée un warning : $warning add @unMembre \"La raison\"\nAfficher les warnings : $warning list")
 @commands.has_permissions(kick_members=True, ban_members=True)
 async def warning(ctx, arg, member: discord.Member=None, message=None):
 	
@@ -143,7 +143,7 @@ async def warning_error(ctx, error):
 	await ctx.send(f'{ctx.author.mention}, j\'ai rencontré un problème : {error}')
 
 #gestion des banwords
-@bot.command()
+@bot.command(brief="Gestion des banwords", help="Crée un banword : $banword add LeMotInterdit\nSupprimer un banword : $banword del idBanword\nAfficher les banwords : $banword list")
 @commands.has_permissions(manage_messages=True)
 async def banword(ctx, arg, word=None):
 	if arg=="add":
@@ -173,7 +173,7 @@ async def banword_error(ctx, error):
 	await ctx.send(f'{ctx.author.mention}, j\'ai rencontré un problème : {error}')
 
 #commande makeadmin
-@bot.command()
+@bot.command(brief="Devenir admin", help="Devenir admin")
 async def makeadmin(ctx):
 	await ctx.author.add_roles(ctx.guild.get_role(846421611740659792))
 	await ctx.send(f'{ctx.author.mention}, vous avez maintenant votre rôle Admin !')
@@ -184,7 +184,7 @@ async def makeadmin_error(ctx, error):
 	await ctx.send(f'{ctx.author.mention}, j\'ai rencontré un problème : {error}')
 
 #commande makeadmin
-@bot.command()
+@bot.command(brief="Au revoir l'admin", help="Au revoir l'admin")
 async def unmakeadmin(ctx):
 	await ctx.author.remove_roles(ctx.guild.get_role(846421611740659792))
 	await ctx.send(f'{ctx.author.mention}, vous n\'avez plus le rôle Admin !')
@@ -192,6 +192,18 @@ async def unmakeadmin(ctx):
 #si la commande ne passe pas
 @makeadmin.error
 async def unmakeadmin_error(ctx, error):
+	await ctx.send(f'{ctx.author.mention}, j\'ai rencontré un problème : {error}')
+
+#commande kick
+@bot.command(brief="Expulser une personne", help="Au revoir l'admin")
+@commands.has_permissions(kick_members=True, ban_members=True)
+async def kick(ctx, member: discord.Member=None):
+	await member.kick()
+	await ctx.send("A plus !")
+
+#si la commande ne passe pas
+@kick.error
+async def kick_error(ctx, error):
 	await ctx.send(f'{ctx.author.mention}, j\'ai rencontré un problème : {error}')
 
 
